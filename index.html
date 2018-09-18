@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+  <head>
+    <title>One Song a Day</title>
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css">
+    <link rel="stylesheet" href="index.css">
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
+
+    <style type="text/css">
+      #login, #loggedin {
+        display: none;
+      }
+      .text-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 500px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="header" class="container">
+      <h1 style="padding-top: 10px; float: left;">One Song A Day</h1>
+      <h3 id="user-name" style="float: right; width: 50%; text-align: right"></h3>
+    </div>
+    <div class="container">
+      <div id="login">
+        <h1>Welcome to One Song a Day</h1>
+        <a href="/login" id="login-btn" class="btn btn-primary">Log in with Spotify</a>
+      </div>
+      <div id="loggedin">
+        <div id="user-profile">
+          <div id="select-mode" style="text-align: center">
+            <h1>Choose an Option to get Started:</h1>
+            <button id="total-random" class="btn btn-primary">Completely Random</button>
+            <button id="user-select-genre" class="btn btn-primary">Select 5 Genres</button>
+          </div>
+          <div id="by-genre">
+            <h1>Pick 5 genres:</h1>
+
+            <select id="genre1" multiple="" class="ui fluid normal dropdown" style="color: black">
+                <option value="">Select 5 Genres</option>
+              <option value="country">Country</option>
+              <option value="classical">Classical</option>
+              <option value="pop">Pop</option>
+              <option value="jazz">Jazz</option>
+              <option value="contemporary r&b">Contemporary R&B</option>
+              <option value="r&b">R&B</option>
+              <option value="rap">Rap</option>
+              <option value="soul">Soul</option>
+              <option value="rock">Rock</option>
+              <option value="disco">Disco</option>
+              <option value="reggae">Reggae</option>
+              <option value="latin">Latin</option>
+              <option value="reggaeton">Reggaeton</option>
+              <option value="alternative">Alternative</option>
+              <option value="electronic">Electronic</option>
+              <option value="synth-pop">Synth-Pop</option>
+              <option value="movies">Movies</option>
+            </select>
+            <button id="submitgenre" class="btn btn-primary">Choose</button>
+          </div>
+          <div id="song_area" style="text-align: center">
+            <h3>Today's Song of the Day:</h3>
+
+          </div>
+        </div>
+        <div id="oauth">
+        </div>
+      </div>
+    </div>
+    <!--
+    <script id="user-profile-template" type="text/x-handlebars-template">
+      <div>
+        <h3>Today's Song of the Day:</h3>
+      </div>
+      <div>
+        <h1>Pick a genre:</h1>
+        <select id="genre1">
+          <option value="country">Country</option>
+          <option value="classical">Classical</option>
+          <option value="pop">Pop</option>
+          <option value="jazz">Jazz</option>
+          <option value="contemporary r&b">Contemporary R&B</option>
+          <option value="r&b">R&B</option>
+          <option value="rap">rap</option>
+          <option value="soul">Soul</option>
+          <option value="rock">Rock</option>
+          <option value="disoc">Disco</option>
+        </select>
+        <button id="submitgenre">Choose</button>
+      </div>
+    </script>
+
+
+    <script id="oauth-template" type="text/x-handlebars-template">
+
+      <h2>oAuth info</h2>
+      <dl class="dl-horizontal">
+        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
+        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
+      </dl>
+
+    </script>
+    !-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script>
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        }
+      (function() {
+
+        /**
+         * Obtains parameters from the hash of the URL
+         * @return Object
+         */
+        function getHashParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+              q = window.location.hash.substring(1);
+          while ( e = r.exec(q)) {
+             hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        /*
+        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
+            userProfileTemplate = Handlebars.compile(userProfileSource),
+            userProfilePlaceholder = document.getElementById('user-profile');
+
+
+        var oauthSource = document.getElementById('oauth-template').innerHTML,
+            oauthTemplate = Handlebars.compile(oauthSource),
+            oauthPlaceholder = document.getElementById('oauth');
+        */
+        var params = getHashParams();
+
+        var access_token = params.access_token,
+            refresh_token = params.refresh_token,
+            error = params.error;
+
+        if (error) {
+          alert('There was an error during the authentication');
+        } else {
+          if (access_token) {
+            // render oauth info
+              /*
+            oauthPlaceholder.innerHTML = oauthTemplate({
+              access_token: access_token,
+              refresh_token: refresh_token
+            });
+            */
+            $.ajax({
+                url: 'https://api.spotify.com/v1/me',
+                headers: {
+                  'Authorization': 'Bearer ' + access_token
+                },
+                success: function(response) {
+                  //userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+
+                  $('#login').hide();
+                  $('#loggedin').show();
+                  console.log(response);
+                  document.getElementById('user-name').innerHTML = response.display_name;
+                }
+            });
+          } else {
+              // render initial screen
+              $('#login').show();
+              $('#loggedin').hide();
+          }
+          /*
+          document.getElementById('obtain-new-token').addEventListener('click', function() {
+            $.ajax({
+              url: '/refresh_token',
+              data: {
+                'refresh_token': refresh_token
+              }
+            }).done(function(data) {
+              access_token = data.access_token;
+              oauthPlaceholder.innerHTML = oauthTemplate({
+                access_token: access_token,
+                refresh_token: refresh_token
+              });
+            });
+          }, false);
+          */
+          $(document).ready(function() {
+              $('#by-genre').hide();
+
+              $('#user-select-genre').click(function() {
+                  $('#select-mode').hide();
+                  $('#by-genre').show();
+              });
+
+              $('#genre1').dropdown({
+                  clearable: true,
+                  maxSelections: 5
+              });
+
+              var genre_list;
+
+              $('#submitgenre').click(function() {
+                  var genre = $('#genre1').val()[getRandomInt(5)];
+                  $.ajax({
+                      url: "https://api.spotify.com/v1/search?q=" + encodeURI(genre) + "&type=track&offset=" + getRandomInt(60),
+                      headers: {
+                          'Authorization': 'Bearer ' + access_token
+                      },
+                      success: function(response) {
+                          console.log(response);
+                          console.log(response.tracks.items[getRandomInt(20)]);
+                          var random_song = response.tracks.items[getRandomInt(20)];
+                          var song_link = "<iframe src='https://open.spotify.com/embed/track/"  + random_song.id +  "' width='100%' height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>";
+                          console.log(random_song.id);
+                          console.log(song_link);
+
+                          $('#song_area').append(song_link);
+                      }
+                  })
+              });
+
+              $('#total-random').click(function() {
+                  $('#select-mode').hide();
+                  $.ajax({
+                      url: "https://api.spotify.com/v1/recommendations/available-genre-seeds",
+                      headers: {
+                          'Authorization': 'Bearer ' + access_token
+                      },
+                      success: function(response) {
+                          console.log(response);
+                          genre_list = response.genres;
+                          var genre = genre_list[getRandomInt(genre_list.length)];
+                          //$('#genre1').val()[getRandomInt(5)]
+
+                          $.ajax({
+                              url: "https://api.spotify.com/v1/search?q=" + encodeURI(genre) + "&type=track&offset=" + getRandomInt(60),
+                              headers: {
+                                  'Authorization': 'Bearer ' + access_token
+                              },
+                              success: function(response) {
+                                  console.log(response);
+                                  console.log(response.tracks.items[getRandomInt(20)]);
+                                  var random_song = response.tracks.items[getRandomInt(20)];
+                                  var song_link = "<iframe src='https://open.spotify.com/embed/track/"  + random_song.id +  "' width='100%' height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>";
+                                  console.log(random_song.id);
+                                  console.log(song_link);
+
+                                  $('#song_area').append(song_link);
+                              }
+                          })
+                      }
+                  });
+
+
+              });
+          });
+
+        }
+      })();
+    </script>
+    <script>
+      $('#submitgenre').click(function() {
+          console.log("Hello");
+      })
+    </script>
+  </body>
+</html>
+
