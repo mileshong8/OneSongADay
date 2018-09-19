@@ -12,7 +12,7 @@ var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
-var client_cred = require('./cred.json');
+var client_cred = require('../cred.json');
 
 var client_id = client_cred.client_id; // Your client id
 var client_secret = client_cred.client_secret; // Your secret
@@ -37,7 +37,7 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-app.use(express.static(__dirname + '/views'))
+app.use(express.static(__dirname))
    .use(cors())
    .use(cookieParser());
 
