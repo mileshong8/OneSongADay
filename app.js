@@ -41,6 +41,10 @@ app.use(express.static(__dirname + '/views'))
    .use(cors())
    .use(cookieParser());
 
+app.get('/', function(req, res) {
+  res.render('index.html');
+});
+
 app.get('/login', function(req, res) {
 
   var state = generateRandomString(16);
@@ -146,3 +150,5 @@ app.get('/refresh_token', function(req, res) {
 
 console.log('Listening on 8888');
 app.listen(8888);
+
+module.exports = app;
